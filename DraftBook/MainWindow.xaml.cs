@@ -54,15 +54,20 @@ namespace DraftBook
 
             try
             {
-                if (File.Exists(filePath))
+                // Перевіряємо, чи вказано ім'я файлу
+                if (string.IsNullOrEmpty(fileName))
                 {
-                    MessageBox.Show("File already exists.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("No file selected.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
+                // Створюємо новий файл і записуємо вміст
                 File.WriteAllText(filePath, fileContent);
 
+                // Додаємо інформацію про файл до колекції для відображення у DataGrid
                 Files.Add(new FileInformation(fileName, fileContent.Split(new char[] { ' ', '\n', '\r', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length, DateTime.Now));
+
+                MessageBox.Show("File created successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
