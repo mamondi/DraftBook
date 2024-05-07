@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -11,6 +12,17 @@ namespace DraftBook
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private ObservableCollection<FileInformation>? _files;
+        private string _filePath; 
+
+        public string FilePath 
+        {
+            get { return _filePath; }
+            set
+            {
+                _filePath = value;
+                OnPropertyChanged("FilePath");
+            }
+        }
 
         public ObservableCollection<FileInformation> Files
         {
@@ -43,20 +55,19 @@ namespace DraftBook
                 return;
             }
 
-            if (fileName.Length > 10)
+            if (fileName.Length > 15)
             {
-                MessageBox.Show("File name should not exceed 10 characters.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("File name should not exceed 15 characters.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            string projectFolder = AppDomain.CurrentDomain.BaseDirectory;
-            string filePath = Path.Combine(projectFolder, fileName + ".txt");
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName + ".txt");
 
             try
             {
-                if (string.IsNullOrEmpty(fileName))
+                if (File.Exists(filePath))
                 {
-                    MessageBox.Show("No file selected.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("File already exists.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -64,13 +75,17 @@ namespace DraftBook
 
                 Files.Add(new FileInformation(fileName, fileContent.Split(new char[] { ' ', '\n', '\r', '\t' }, StringSplitOptions.RemoveEmptyEntries).Length, DateTime.Now));
 
-                MessageBox.Show("File created successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                FilePath = filePath;
+
+                dbFileList.SelectedItem = Files.LastOrDefault();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error creating file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+
 
         private void HidePanel_Click(object sender, RoutedEventArgs e)
         {

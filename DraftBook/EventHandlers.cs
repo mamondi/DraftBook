@@ -37,6 +37,8 @@ namespace DraftBook
                 ReadFileContentTextBox.Text = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, selectedFile.Theme + ".txt"));
                 ReadPanel.Visibility = Visibility.Visible;
 
+                FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, selectedFile.Theme + ".txt"); 
+
                 SaveButton.Click -= SaveButton_Click;
                 CloseReadPanelButton.Click -= CloseReadPanelButton_Click;
 
@@ -61,9 +63,9 @@ namespace DraftBook
                 return;
             }
 
-            if (fileName.Length > 10)
+            if (fileName.Length > 15)
             {
-                MessageBox.Show("File name should not exceed 10 characters.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("File name should not exceed 15 characters.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -83,7 +85,7 @@ namespace DraftBook
                 if (fileName != selectedFile.Theme)
                 {
                     File.Move(oldFilePath, newFilePath);
-                    selectedFile.Theme = fileName; 
+                    selectedFile.Theme = fileName;
                 }
 
                 File.WriteAllText(newFilePath, fileContent);
@@ -91,6 +93,10 @@ namespace DraftBook
                 FileOperations.UpdateDataGrid(Files);
 
                 dbFileList.SelectedItem = selectedFile;
+
+                FilePath = newFilePath;
+
+                ReadPanel.Visibility = Visibility.Collapsed;
             }
             catch (Exception ex)
             {
